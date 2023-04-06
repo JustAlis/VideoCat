@@ -1,0 +1,42 @@
+{% load static %} 
+<!-- Загрузите библиотеку значков, чтобы отобразить меню гамбургера (бары) на маленьких экранах -->
+<head>
+    <link rel="shortcut icon" href="{% static 'macavity/images/favicon.ico' %}" type="image/x-icon"/>
+    <link  rel="stylesheet" type="text/css" href="{% static 'macavity/css/styles.css' %}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src ="{% static 'macavity/js/script.js' %}" defer></script>
+</head>
+<body>
+    <a href="#" class="menu-btn"></a>
+    <div class="topnav">
+        <a href="{% url 'home' %}"><div class="logo"></div></a>
+    </div>
+    <div class="topnav_search">
+        <form action="{% url 'search' %}" method="get">
+            <label>Поиск</label>
+            <input type="search" name = "search_input">
+            <button type="submit">Найти</button>
+        </form>
+    </div>
+	<div class="topnav_last">
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'channel' request.user.slug %}">My channel</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">register</a>
+        {% endif %}
+	</div>
+    <div class="menu">
+        <nav class="menu-list">
+            <a href="{% url 'home' %}">Главная</a>
+            <a href="{% url 'categories' %}">Категории</a>
+            <a href="{% url 'subscribes' %}">Подписки</a>
+            <a href="#">Плейлисты</a>
+            <a href="#">История</a>
+            <a href="#">Понравившиеся</a>
+        </nav>
+    </div>
+{% block content %}
+{% endblock %}
+</body>

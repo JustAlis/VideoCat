@@ -1,0 +1,128 @@
+{% extends 'macavity/base.html' %}
+{% load static %}
+{% block content %}
+<div class="content">
+    {% if channel.hat %}
+        <section class="channel">
+            <div class="hat">
+                <img src="{{channel.hat.url}}" style="width: 100vw;"></img>
+            </div>
+            <div class="underhat">
+                <h2>
+                    {% if channel.avatar %}
+                            <img src="{{channel.avatar.url}}" width="45px">
+                    {% else %}
+                            <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                    {% endif %}
+                    {{channel.username}}
+                    {% if channel.username == request.user.username %}
+                        Подписчики
+                        <div id="sub_counter"> 
+                            {{channel.sub_num}}
+                        </div>
+                        <a href="{% url 'changechannel' %}">Редактировать канал</a>
+                        <a href="{% url 'addvideo' %}">Добавить видео</a>
+                    {% elif request.user.is_authenticated%}
+                        Подписчики
+                        <div id="sub_counter"> 
+                            {{channel.sub_num}}
+                        </div>
+                        <button class="subscribe_btn" id="subscribe_btn">Подписаться</button>
+                    {% else %}
+                        Подписчики 
+                        <div id="sub_counter"> 
+                            {{channel.sub_num}}
+                        </div>
+                    {% endif %}
+                </h2>
+            </div>
+        </section>
+    {% else %}
+        <section class="channel_hatless">
+            <div class="underhat">
+                <h2>
+                    {% if channel.avatar %}
+                        <img src="{{channel.avatar.url}}" width="45px">
+                    {% else %}
+                        <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                    {% endif %}
+                    {{channel.username}}
+                    {% if channel.username == request.user.username %}
+                        Подписчики
+                        <div id="sub_counter"> 
+                            {{channel.sub_num}}
+                        </div>
+                        <a href="{% url 'changechannel' %}">Редактировать канал</a>
+                        <a href="{% url 'addvideo' %}">Добавить видео</a>
+                    {% elif request.user.is_authenticated %}
+                        Подписчики
+                        <div id="sub_counter"> 
+                            {{channel.sub_num}}
+                        </div>
+                        <button class="subscribe_btn" id="subscribe_btn">Подписаться</button>
+                    {% else %}
+                        Подписчики
+                        <div id="sub_counter"> 
+                            {{channel.sub_num}}
+                        </div>
+                    {% endif %}
+                </h2>
+            </div>
+        </section>
+    {% endif %}
+    {% if channel.videos.all %}
+        <section class="channel_list">
+            <h2>Видео</h2>
+            <div class="c_channel">
+                {% for video in channel.videos.all %}
+                    {% if video.published or channel.username == request.user.username %}
+                        <div class="v">
+                            {{ video.video_title }}
+                            {% if video.preview %}
+                                <a href="{% url 'video' video.slug %}"><img src="{{video.preview.url}}" width="320" height="180"></a>
+                            {% else %}
+                                <a href="{% url 'video' video.slug %}"><img src="{% static 'macavity/images/black_back.jpg' %}" width="320" height="180"></a>
+                            {% endif %}
+                            {{video.publish_date}}
+                        </div>  
+                    {% endif %} 
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+    <section class="channel_list">
+        <h2>Плейлисты</h2>
+        <div class="c_channel">
+            {% for playlist in channel.playlists.all %}
+                {% if not playlist.hidden or channel.username == request.user.username %}
+                    <div class="v">
+                        {{ playlist.playlist_name }}
+                        {% if playlist.playlist_picture %}
+                            <a href="{% url 'playlist' playlist.slug %}"><img src="{{playlist.playlist_picture.url}}" width="320" height="180"></a>
+                        {% else %}
+                            <a href="{% url 'playlist' playlist.slug %}"><img src="{% static 'macavity/images/black_back.jpg' %}" width="320" height="180"></a>
+                        {% endif %}
+                    </div>  
+                {% endif %} 
+            {% endfor %}
+        </div>
+    </section>
+    <section class="channel_subbed_on">
+        <h2>Подписки</h2>
+        <h2>
+            {% for channel in subscribed_at %}
+                <a href="{% url 'channel' channel.slug %}"> {{channel.username}}</a>
+            {% endfor %}
+        </h2>
+    </section>
+    {% if channel.description %}
+        <section class="channel_about">
+            <h2>
+                Описание 
+                <br> 
+                {{channel.description}}
+            </h2>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

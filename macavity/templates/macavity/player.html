@@ -1,0 +1,110 @@
+{% extends 'macavity/base.html' %}
+{% load static %}
+{% block content %}
+{% if video.published or user.username == video.author_channel.username %}
+    <section class="player">
+        <div class="video_all">
+            <div class="video_decor">
+                {% if video.preview %}
+                    <video width="1056" height="604" controls type="video/mp4" class="video_big" poster="{{video.preview.url}}">
+                {% else %}
+                    <video width="1056" height="604" controls type="video/mp4" class="video_big" poster="{% static 'macavity/images/black_back.jpg' %}">
+                {% endif %}
+                    <source src="{% url 'chunks' video.slug %}" type="video/mp4"/>
+                </video>
+            </div>
+            <div class="under_player">
+                <h2>
+                    <div class="video_title">
+                        {{video.video_title}}
+                    </div>
+                    <div class="video_stats">
+                        просмотры: {{video.views}}
+                        {% if user.is_authenticated and user.username != video.author_channel.username %}
+                            <button id="like">лайк</button> <span id="likes_value">{{video.likes}}</span>
+                            <button id="dislike">дизлайк</button> <span id="dislikes_value">{{video.dislikes}}</span>
+                        {% else %}
+                            лайки <span id="likes_value">{{video.likes}}</span>
+                            дизлайки <span id="dislikes_value">{{video.dislikes}}</span>
+                        {% endif %}
+                    </div>
+                </h2>
+                <h2>
+                    <div class="channel_under_video">
+                        {% if video.author_channel.avatar %}
+                            <a href="{% url 'channel' video.author_channel.slug %}">
+                                <img src="{{video.author_channel.avatar.url}}" width="45px">
+                            </a>
+                        {% else %}
+                            <a href="{% url 'channel' video.author_channel.slug %}">
+                                <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'channel' video.author_channel.slug %}">{{video.author_channel.username}}</a>
+                        &ensp;
+                        Подписчики: {{video.sub_num}}
+                        <div class="publish_time_player">
+                            {{video.publish_date}}
+                        </div>
+                    </div>
+                </h2>
+                <div class="full_width_btn">
+                    <button id="cat_btn">Категории</button>
+                    {% if user.is_authenticated  %}
+                        <button class="add_to_playlist" id="add_to_playlist">Добавить в плейлист</button>
+                    {% endif %}
+                </div>
+                <div class="cats_in_player">
+                    {% for cat in  video.cat.all %}
+                        <a href="{% url 'category' cat.slug %}">{{cat}}</a>
+                    {% endfor %}
+                </div>
+                <div class="full_width_btn">
+                    <button id="description_btn">Описание</button>
+                    {% if user.username == video.author_channel.slug %}
+                        <button class="chanhe_video_btn" id="change_video_btn">Редактировать видео</button>
+                        <input hidden type="text" value="{% url 'changevideo' video.slug %}" id="change_video_redirrect_url">
+                    {% endif %}
+                </div>
+                <div class="description_in_player">
+                    {{video.description}}
+                </div>
+            </div>
+        </div>
+        <div class="playlists_list" id="playlists_list">
+            <form class="add_playlist_form" name="add_playlist_form">
+                {% csrf_token %}
+                <label for="add_playlist_name">Имя плейлиста</label>
+                <input type="text" name="add_playlist_name" id="add_playlist_name" required maxlength="255">
+                <button type="submit" name="add_playlist_btn" id="add_playlist_btn">создать плейлист</button>
+            </form>
+            <div class="playlists_list_replace">
+            </div>
+        </div>
+        <form name ="comment_form" class="comment_input">
+            {% if user.is_authenticated %}
+                {% csrf_token %}
+                <label for="comment_text">Комметарии</label>
+                <input type="text" name="comment_text" id="comment_text" required maxlength="255">
+                <input type="hidden" id="video_comment"  value="{{ video.pk }}">
+                <button type="submit">Коммент</button>
+            {% else %}
+                <h4>&emsp;&emsp;<a href="{% url 'register' %}">register</a>&emsp;|&emsp;<a href="{% url 'login' %}">Login</a></h4>
+            {% endif %}
+        </form>
+        <div class="comments" id="comments">
+            {% for comment in video.video_comments.all %}
+                <div class="comment">
+                    <a href="{% url 'channel' comment.channel_comment.slug%}">{{comment.channel_comment.username}}</a>
+                    {{comment.comment_text}}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="video_connected">   
+            буп
+            бип
+            буп
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

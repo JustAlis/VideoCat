@@ -1,0 +1,6 @@
+{% for comment in object_list %}
+    <div class="comment">
+        <a href="{% url 'channel' comment.channel_comment.slug%}">{{comment.channel_comment.username}}</a>
+        {{comment.comment_text}}
+    </div>
+{% endfor %}

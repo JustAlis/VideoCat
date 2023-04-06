@@ -1,0 +1,38 @@
+{% extends 'macavity/base.html' %}
+{% load static %}
+{% block content %}
+{% if not playlist.hidden or playlist.channel_playlist.username == request.user.username %}
+    <div class="content">
+        <section class="videos_list">
+            <div class="playlist_top">
+                <h2>
+                    {% if playlist.channel_playlist.avatar %}
+                            <img src="{{playlist.channel_playlist.avatar.url}}" width="45px">
+                    {% else %}
+                            <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                    {% endif %}
+                    <a href="{% url 'channel' playlist.channel_playlist.slug %}">{{ playlist.channel_playlist.username }}</a>
+                    {{ playlist.playlist_name }}
+                    {% if playlist.channel_playlist.username == request.user.username and not playlist.algo_playlist%}
+                        <a href="{% url 'changeplaylist' playlist.slug %}">Редактировать плейлист</a>
+                    {% endif %}
+                </h2>
+            </div>
+            <div class="c_playlist">
+                {% for video in playlist.included_video.all %}
+                <div class="v_playlist">
+                    {{ video.video_title }}
+                    {% if video.preview %}
+                        <a href="{% url 'video' video.slug %}"><img src="{{video.preview.url}}" width="320" height="180"></a>
+                    {% else %}
+                        <a href="{% url 'video' video.slug %}"><img src="{% static 'macavity/images/black_back.jpg' %}" width="320" height="180"></a>
+                    {% endif %}
+                    {{video.publish_date}}
+                    <a href="{% url 'channel' video.author_channel.username %}">{{video.author_channel.username}}</a>
+                </div>
+                {% endfor %}
+            </div>   
+        </section>
+    </div>
+{% endif %}
+{% endblock %}
