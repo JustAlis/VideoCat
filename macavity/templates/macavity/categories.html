@@ -4,7 +4,7 @@
 <div class="content">
     {% for category in cats %}
         {% if forloop.first %}
-            <section class="main">
+            <section class="categories_section_top">
                 <h2>{{ category.category_name }}</h2>
                 <div class="c">
                     {% for video in category.videos.all %}
@@ -22,7 +22,7 @@
                 </div>
             </section>
         {% else %}
-            <section>
+            <section class="categories_section">
                 <h2>{{ category.category_name }}</h2>
                 <div class="c">
                     {% for video in category.videos.all %}

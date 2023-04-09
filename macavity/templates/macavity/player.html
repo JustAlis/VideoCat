@@ -42,7 +42,18 @@
                         {% endif %}
                         <a href="{% url 'channel' video.author_channel.slug %}">{{video.author_channel.username}}</a>
                         &ensp;
-                        Подписчики: {{video.sub_num}}
+                        {% if user.is_authenticated and user.username != video.author_channel.username %}
+                            <div id="sub_counter"> 
+                                Подписчики: {{video.sub_num}}
+                            </div>
+                            {% csrf_token %}
+                            &ensp;
+                            <button class="subscribe_video_btn" id="subscribe_video_btn">Подписаться</button>
+                        {% else %}
+                            <div id="sub_counter"> 
+                                Подписчики: {{video.sub_num}}
+                            </div>
+                        {% endif %}
                         <div class="publish_time_player">
                             {{video.publish_date}}
                         </div>

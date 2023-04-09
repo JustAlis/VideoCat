@@ -58,7 +58,7 @@ class LoginUserForm(AuthenticationForm):
 class AddVideoForm(forms.ModelForm):
     class Meta:
         model = Video
-        fields = ['video_title', 'content', 'preview', 'cat', 'description', 'published']
+        fields = ['cat', 'video_title', 'content', 'preview', 'description', 'published']
 
 class AddPlaylistForm(forms.ModelForm):
     class Meta:
@@ -87,4 +87,4 @@ class ChangePlaylist(forms.ModelForm):
 class ChangeVideo(forms.ModelForm):
     class Meta:
         model = Video
-        fields = ['video_title', 'preview', 'cat', 'description', 'published']
+        fields = ['cat', 'video_title', 'preview', 'description', 'published']

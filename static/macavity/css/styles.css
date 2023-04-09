@@ -11,18 +11,45 @@ a{
 
 section {
   height: 40vh;
-  /* display: flex; */
-  /* justify-content: left; */
-  /* align-items: top; */
   color: #ffffff;
   background-color: #0c0159;
   border-bottom: 5px solid #000000;
   overflow: hidden;
 }
-section:hover {
-    background-color: #17059c;
-    overflow-x: scroll;
-  }
+
+
+/* categories */
+.categories_section:hover{
+  background-color: #17059c;
+  overflow-x: scroll;
+}
+.categories_section_top{
+  position: relative;
+  margin-top:8vh;
+}
+
+.categories_section_top:hover{
+  background-color: #17059c;
+  overflow-x: scroll;
+}
+
+/* video player */
+.player{
+  display: flex;
+  flex-direction: column;
+  margin-top:8vh;
+  position: relative;
+  height: 91vh;
+  overflow-y: scroll;
+}
+
+.video_all{
+  text-decoration: none;
+  overflow-y: hidden;
+}
+.video_all:hover{
+  overflow-y: scroll;
+}
 
 .video_decor{
   left: 240px;
@@ -64,6 +91,7 @@ section:hover {
   position: absolute;
   left: 0;
 }
+
 .channel_under_video{
   display: flex;
   position: relative;
@@ -115,13 +143,7 @@ section:hover {
   width: 20vw;
 }
 
-.video_all{
-  text-decoration: none;
-  overflow-y: hidden;
-}
-.video_all:hover{
-  overflow-y: scroll;
-}
+
 .comments{
   height: 83vh;
   position: fixed;
@@ -170,29 +192,20 @@ section:hover {
   flex-direction: column;
 }
 
-.player{
-  display: flex;
-  flex-direction: column;
-  margin-top:8vh;
-  position: relative;
-  height: 91vh;
-  overflow-y: scroll;
+.cats_in_player{
+  display: none;
 }
-.player:hover {
-  background-color: #0c0159;
+.cats_in_player-active{
+  display:inline;
+}
+.description_in_player{
+  display: none;
+}
+.description_in_player-active{
+  display:inline;
 }
 
-.home{
-  display: flex;
-  flex-direction: column;
-  margin-top:8vh;
-  position: relative;
-  height: 91vh;
-  overflow-y: scroll;
-}
-.home:hover {
-  background-color: #0c0159;
-}
+/* home page, searh, other lists of videos */
 .videos_list{
   display: flex;
   flex-direction: column;
@@ -201,19 +214,9 @@ section:hover {
   height: 91vh;
   overflow-y: scroll;
 }
-.videos_list:hover {
-  background-color: #0c0159;
-}
-.main{
-  position: relative;
-  margin-top:8vh;
-}
-.content h2{
-  margin-top: 1vh;
-  margin-bottom: 1vh;
-  margin-left: 2vw;
 
-}
+
+/* channel page */
 .hat{
   position: relative;
   height: 33vh;
@@ -242,14 +245,23 @@ section:hover {
   height: 9vh;
   overflow-y: scroll;
 }
-.channel_hatless:hover{
-  background-color: #0c0159;
-}
-.channel:hover {
-  background-color: #0c0159;
-}
+
 .channel_list{
   height: 36vh;
+}
+.channel_list:hover{
+  background-color: #17059c;
+  overflow-x: scroll;
+}
+.channel_subbed_on:hover{
+  background-color: #17059c;
+  overflow-x: scroll;
+}
+.channel_about:hover{
+  background-color: #17059c;
+}
+.channel_about{
+  height: fit-content;
 }
 div.underhat{
   width: 100vw;
@@ -267,7 +279,7 @@ div.underhat{
   align-items: center;
   gap: 15px;
 }
-
+/* playlist  */
 div.playlist_top{
   width: 100vw;
   position: relative;
@@ -285,6 +297,7 @@ div.playlist_top{
   gap: 15px;
 }
 
+/* wrappers for videos and playlists in categories, channels, and playlists*/
 div.v{
   position: relative;
   justify-content: top;
@@ -323,16 +336,18 @@ div.c_channel{
   height: 30vh;
 }
 
+/* forms  */
 .register_login{
   justify-content: center;
   align-items: top;
   margin-top:8vh;
   position: relative;
   height: 100vh;
+  left: 40vw;
 }
-.register_login:hover {
-  background-color: #0c0159;
-}
+
+
+/* side menu */
 .menu {
   padding-top: 8vh;
   position: fixed;
@@ -383,30 +398,23 @@ color: white;
   position: relative;
   z-index: 0;
 }
+.content h2{
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  margin-left: 2vw;
+}
 .content_active {
   transform: translateX(15%);
 }
 
-/* header */
+
+/* style for top navigatiopn panel */
 .logo {
 	background: url('../images/favicon.ico');
 	width: 45px;
 	height: 45px;
 	overflow:hidden;
 }
-.cats_in_player{
-  display: none;
-}
-.cats_in_player-active{
-  display:inline;
-}
-.description_in_player{
-  display: none;
-}
-.description_in_player-active{
-  display:inline;
-}
-
 
 .topnav {
 	background-color: black;
@@ -425,18 +433,18 @@ color: white;
 .topnav-active {
     transform: translateX(11%);
 }
-  /* Стиль ссылок внутри панели навигации */
-  .topnav a {
-  text-transform: uppercase;
-	float: left;
-	display: block;
-	color: #f2f2f2;
-	text-align: auto;
-	padding: 14px 14px;
-	text-decoration: none;
-  position: relative;
-  left: 4%;
-  }
+
+.topnav a {
+text-transform: uppercase;
+float: left;
+display: block;
+color: #f2f2f2;
+text-align: auto;
+padding: 14px 14px;
+text-decoration: none;
+position: relative;
+left: 4%;
+}
 .topnav_last {
   height: 8vh;
 	overflow: hidden;
@@ -477,21 +485,18 @@ color: white;
 	text-decoration: none;
 }
   
-  /* Изменение цвета ссылок при наведении курсора */
-  .topnav a:hover {
-    background-color: #17059c;
-	  color: white;
-    filter: drop-shadow(0 0 px  #17059c);
+.topnav a:hover {
+  background-color: #17059c;
+  color: white;
+  filter: drop-shadow(0 0 px  #17059c);
 
-  }
-  
-  /* Добавить активный класс, чтобы выделить текущую страницу */
-  .topnav a.active {
-	color: white;
-  }
+}
 
-/* полоса прокрутки */
-/* width */
+.topnav a.active {
+color: white;
+}
+
+/* hide scrollbars */
 ::-webkit-scrollbar {
     width: 0;
     height: 0;

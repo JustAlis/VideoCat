@@ -21,7 +21,7 @@ const change_video_btn = document.getElementById('change_video_btn')
 
 const subscribe_btn = document.getElementById('subscribe_btn')
 
-
+const subscribe_video_btn = documentgetElementById('subscribe_video_btn')
 //MENU SCRIPT
 menuBtn.addEventListener('click', function(e) {
   e.preventDefault();
@@ -261,7 +261,33 @@ if(subscribe_btn){
       if(xhr.readyState == 4 && xhr.status == 200){
         let new_data=xhr.responseText;
         let jsonResponse = JSON.parse(new_data);
-        alert
+
+        document.getElementById("sub_counter").innerHTML = jsonResponse["sub_num"];
+      }
+    }
+    xhr.send()
+    
+  }
+}
+
+
+//subscribe from video_player
+if(subscribe_video_btn){
+  subscribe_video_btn.onclick = function(e){
+    e.preventDefault();
+    alert('так')
+    let url = window.location.href
+    let xhr = new XMLHttpRequest();
+
+    xhr.open('GET', url, true)
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    xhr.setRequestHeader('get-requets', 'subscribe')
+
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState == 4 && xhr.status == 200){
+        let new_data=xhr.responseText;
+        let jsonResponse = JSON.parse(new_data);
+
         document.getElementById("sub_counter").innerHTML = jsonResponse["sub_num"];
       }
     }

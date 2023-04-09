@@ -112,6 +112,7 @@
         <h2>
             {% for channel in subscribed_at %}
                 <a href="{% url 'channel' channel.slug %}"> {{channel.username}}</a>
+                {{channel.sub_num}}
             {% endfor %}
         </h2>
     </section>

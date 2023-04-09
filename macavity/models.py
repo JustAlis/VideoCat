@@ -5,7 +5,8 @@ from django.contrib.auth.models import AbstractUser
 from .utils import unique_slugify
 from django.utils import timezone
 from django.core.validators import FileExtensionValidator
-from django.db.models.signals import pre_save, pre_delete
+from django.db.models.signals import pre_save, post_delete, post_save
+#raw query for sub system, to delete all the relations when channel is deleted
 from .servises import remove_all_subscriptions
 
 def path_to_avatars(instance, filename):
@@ -26,6 +27,8 @@ class Channel(AbstractUser):
 
     sex = models.CharField(max_length=1, choices=sex_choises, verbose_name = 'sex', blank=True, null=True)
 
+    # !!!WARNING!!! do not use standart methodsfor this field. Standart behavior doesnt work for this priject
+    # check servises.py with slq raw queries
     sub_system = models.ManyToManyField('self')
 
     date_of_birth = models.DateField(verbose_name = 'date_of_birth', blank=True, null=True)
@@ -50,7 +53,7 @@ class Channel(AbstractUser):
 class Video(models.Model):
 
     author_channel = models.ForeignKey('Channel', on_delete=models.CASCADE, verbose_name = 'author_channel', 
-                                       db_index=True, related_name='videos', blank=True, null=True)
+                                       related_name='videos', blank=True, null=True)
     cat = models.ManyToManyField('Category', verbose_name="categories", related_name='videos')
 
     video_title = models.CharField(max_length=100, verbose_name = 'title', db_index=True)
@@ -78,23 +81,11 @@ class Video(models.Model):
     def get_absolute_url(self):
         return reverse('video', kwargs={'slug': self.slug})
     
-    # def save(self, **kwargs):
-        # slug_str ="%s" % self.video_title
-        # unique_slugify(self, slug_str)
-
-        # if self.published and not self.published_verif:
-        #     self.published_verif=True
-        #     self.publish_date = timezone.now()
-            
-        # super().save(**kwargs)
-
-    
     class Meta:
         ordering = ['views']
 
 class Playlist(models.Model):
-    channel_playlist = models.ForeignKey('Channel', on_delete=models.CASCADE, verbose_name = 'channel_playlist',
-                                          db_index=True, related_name='playlists')
+    channel_playlist = models.ForeignKey('Channel', on_delete=models.CASCADE, verbose_name = 'channel_playlist', related_name='playlists')
     included_video = models.ManyToManyField('Video', verbose_name = 'included_video', related_name='playlists')
 
     playlist_name = models.CharField(max_length=100, verbose_name="playlist_name", db_index=True)
@@ -130,8 +121,6 @@ class Category(models.Model):
         return reverse('category', kwargs={'category_slug': self.slug})
     
     class Meta:
-        # verbose_name = 'Категория'
-        # verbose_name_plural = 'Категории'
         ordering = ['category_name']
 
 
@@ -161,10 +150,13 @@ def slugfy_video(sender, instance, **kwargs):
         unique_slugify(instance, slug_str)
 
 @receiver(pre_save, sender=Channel)
-def fistr_save_channel(sender, instance, **kwargs):
+def first_save_channel(sender, instance, **kwargs):
     if instance.slug is None:
         slug_str ="%s" % instance.username
         unique_slugify(instance, slug_str)
+
+@receiver(post_save, sender=Channel)
+def first_save_channel_add_playlists(sender, instance, **kwargs):
         Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='liked', algo_playlist=True, channel_playlist = instance)
         Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='disliked', algo_playlist=True, channel_playlist = instance)
         Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='watched', algo_playlist=True, channel_playlist = instance)
@@ -186,6 +178,6 @@ def slugify_cat(sender, instance, **kwargs):
         slug_str ="%s" % instance.category_name
         unique_slugify(instance, slug_str)
 
-@receiver(pre_delete, sender=Channel)
+@receiver(post_delete, sender=Channel)
 def slugify_cat(sender, instance, **kwargs):
     remove_all_subscriptions(instance.id)

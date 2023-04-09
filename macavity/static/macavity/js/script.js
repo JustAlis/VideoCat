@@ -21,6 +21,9 @@ const change_video_btn = document.getElementById('change_video_btn')
 
 const subscribe_btn = document.getElementById('subscribe_btn')
 
+const subscribe_video_btn = document.getElementById('subscribe_video_btn')
+
+const add_cat_btn = document.getElementById('add_cat_btn')
 
 //MENU SCRIPT
 menuBtn.addEventListener('click', function(e) {
@@ -49,6 +52,39 @@ if(change_video_btn){
       window.location.href=redirrect_url
     }
   }
+
+//POST add cat ajax
+if(add_cat_btn){
+  add_cat_btn.onclick = function(e){
+    e.preventDefault();
+    let csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let url = window.location.href;
+    let input = document.getElementById('add_cat_form').add_cat_name.value
+    input = encodeURIComponent(input)
+
+    let data = JSON.stringify({
+      cat_name: input,
+      request: 'add_comment',
+    })
+
+    let xhr = new XMLHttpRequest();
+    
+    xhr.open('POST', url, true)
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    xhr.setRequestHeader('X-CSRFToken', csrf)
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState == 4 && xhr.status == 200){
+        let new_data=xhr.responseText;
+        let jsonResponse = JSON.parse(new_data);
+        
+        document.getElementById('id_cat').innerHTML = jsonResponse["html"];
+        document.getElementById('add_cat_form').reset();
+      }
+    }
+    xhr.send(data)
+    
+  }
+}
 
 //GET USER PLAYLISTS AJAX
 if(add_to_playlist_btn){
@@ -261,7 +297,33 @@ if(subscribe_btn){
       if(xhr.readyState == 4 && xhr.status == 200){
         let new_data=xhr.responseText;
         let jsonResponse = JSON.parse(new_data);
-        alert
+
+        document.getElementById("sub_counter").innerHTML = jsonResponse["sub_num"];
+      }
+    }
+    xhr.send()
+    
+  }
+}
+
+
+//subscribe from video_player
+if(subscribe_video_btn){
+  subscribe_video_btn.onclick = function(e){
+    e.preventDefault();
+
+    let url = window.location.href
+    let xhr = new XMLHttpRequest();
+
+    xhr.open('GET', url, true)
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    xhr.setRequestHeader('get-requets', 'subscribe')
+
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState == 4 && xhr.status == 200){
+        let new_data=xhr.responseText;
+        let jsonResponse = JSON.parse(new_data);
+
         document.getElementById("sub_counter").innerHTML = jsonResponse["sub_num"];
       }
     }

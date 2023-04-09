@@ -74,9 +74,10 @@ def remove_all_subscriptions(channel_id):
         cursor.execute("""
             DELETE 
             FROM "macavity_channel_sub_system" 
-            WHERE ("from_channel_id" = %s)
+            WHERE ("from_channel_id" = %s
+            AND "to_channel_id" = %s)
             """, 
-            [channel_id])
+            [channel_id, channel_id])
 
 def check_if_subscribed(subscriber_id, subscribed_at_id):
     with connection.cursor() as cursor:
