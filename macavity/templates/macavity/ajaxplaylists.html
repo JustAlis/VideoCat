@@ -1,5 +1,0 @@
-{% for playlist in object_list %}
-    <div class="add_video_to_playlist">
-        <input type="button" class="add_video_to_playlist_btn" value={{playlist.playlist_name}} onclick="add_video_to_playlist({{playlist.pk}})">
-    </div>
-{% endfor %}

@@ -7,69 +7,39 @@
             <div class="hat">
                 <img src="{{channel.hat.url}}" style="width: 100vw;"></img>
             </div>
-            <div class="underhat">
-                <h2>
-                    {% if channel.avatar %}
-                            <img src="{{channel.avatar.url}}" width="45px">
-                    {% else %}
-                            <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
-                    {% endif %}
-                    {{channel.username}}
-                    {% if channel.username == request.user.username %}
-                        Подписчики
-                        <div id="sub_counter"> 
-                            {{channel.sub_num}}
-                        </div>
-                        <a href="{% url 'changechannel' %}">Редактировать канал</a>
-                        <a href="{% url 'addvideo' %}">Добавить видео</a>
-                    {% elif request.user.is_authenticated%}
-                        Подписчики
-                        <div id="sub_counter"> 
-                            {{channel.sub_num}}
-                        </div>
-                        <button class="subscribe_btn" id="subscribe_btn">Подписаться</button>
-                    {% else %}
-                        Подписчики 
-                        <div id="sub_counter"> 
-                            {{channel.sub_num}}
-                        </div>
-                    {% endif %}
-                </h2>
-            </div>
-        </section>
     {% else %}
         <section class="channel_hatless">
-            <div class="underhat">
-                <h2>
-                    {% if channel.avatar %}
-                        <img src="{{channel.avatar.url}}" width="45px">
-                    {% else %}
-                        <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
-                    {% endif %}
-                    {{channel.username}}
-                    {% if channel.username == request.user.username %}
-                        Подписчики
-                        <div id="sub_counter"> 
-                            {{channel.sub_num}}
-                        </div>
-                        <a href="{% url 'changechannel' %}">Редактировать канал</a>
-                        <a href="{% url 'addvideo' %}">Добавить видео</a>
-                    {% elif request.user.is_authenticated %}
-                        Подписчики
-                        <div id="sub_counter"> 
-                            {{channel.sub_num}}
-                        </div>
-                        <button class="subscribe_btn" id="subscribe_btn">Подписаться</button>
-                    {% else %}
-                        Подписчики
-                        <div id="sub_counter"> 
-                            {{channel.sub_num}}
-                        </div>
-                    {% endif %}
-                </h2>
-            </div>
-        </section>
     {% endif %}
+        <div class="underhat">
+            <h2>
+                {% if channel.avatar %}
+                        <img src="{{channel.avatar.url}}" width="45px">
+                {% else %}
+                        <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                {% endif %}
+                {{channel.username}}
+                {% if channel.username == request.user.username %}
+                    Подписчики
+                    <div id="sub_counter"> 
+                        {{channel.sub_num}}
+                    </div>
+                    <a href="{% url 'changechannel' %}">Редактировать канал</a>
+                    <a href="{% url 'addvideo' %}">Добавить видео</a>
+                {% elif request.user.is_authenticated%}
+                    Подписчики
+                    <div id="sub_counter"> 
+                        {{channel.sub_num}}
+                    </div>
+                    <button class="subscribe_btn" id="subscribe_btn">Подписаться</button>
+                {% else %}
+                    Подписчики 
+                    <div id="sub_counter"> 
+                        {{channel.sub_num}}
+                    </div>
+                {% endif %}
+            </h2>
+        </div>
+    </section>
     {% if channel.videos.all %}
         <section class="channel_list">
             <h2>Видео</h2>

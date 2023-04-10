@@ -19,7 +19,7 @@ def check_ajax_request_get(request):
 def handle_get_request_videoplayer(request, slug):
     if request.headers.get('get-requets') == 'user-playlists':
         selected_playlists = Playlist.objects.filter(channel_playlist__pk=request.user.id, algo_playlist=False)
-        playlists = render_to_string('macavity/ajaxplaylists.html', {'object_list':selected_playlists})
+        playlists = render_to_string('macavity/ajax/ajaxplaylists.html', {'object_list':selected_playlists})
         return JsonResponse({"html": playlists})
     
     elif request.headers.get('get-requets') == 'subscribe':
@@ -57,7 +57,7 @@ def handle_post_request_videoplayer(request, user, comments_queryset, slug):
 
             selected_comments = comments_queryset.filter(video_comment=video)
 
-            comments = render_to_string('macavity/ajaxcomments.html', {'object_list':selected_comments})
+            comments = render_to_string('macavity/ajax/ajaxcomments.html', {'object_list':selected_comments})
             return JsonResponse({"html": comments})
 
         elif data['request'] == 'like':
@@ -163,7 +163,7 @@ def handle_post_request_videoplayer(request, user, comments_queryset, slug):
             Playlist.objects.create(playlist_name=new_playlist_name, channel_playlist=user)
 
             selected_playlists = Playlist.objects.filter(channel_playlist__pk=user.id, algo_playlist=False)
-            playlists = render_to_string('macavity/ajaxplaylists.html', {'object_list':selected_playlists})
+            playlists = render_to_string('macavity/ajax/ajaxplaylists.html', {'object_list':selected_playlists})
             return JsonResponse({"html": playlists})
         
         
@@ -191,12 +191,12 @@ def add_subscriber_channel(slug, username):
     new_sub_num =get_number_of_subs(subscribed_at.pk)
     return JsonResponse({"sub_num": new_sub_num})
 
-def handle_pos_request_add_category(request):
+def handle_post_request_add_category(request):
     data = json.loads(request.body.decode('UTF-8'))
     if data['request'] == 'add_comment':
         new_cat_name = urllib.parse.unquote(data['cat_name'])
 
         Category.objects.create(category_name=new_cat_name)
         selected_cats = Category.objects.all()
-        cats = render_to_string('macavity/ajaxcats.html', {'object_list': selected_cats})
+        cats = render_to_string('macavity/ajax/ajaxcats.html', {'object_list': selected_cats})
         return JsonResponse({"html": cats})

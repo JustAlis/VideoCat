@@ -142,31 +142,7 @@ section {
   background-color: #0c0159;
   width: 20vw;
 }
-/*  */
-.add_cat_form_wrapper{
-  position: fixed;
-  top: 40vh;
-  left: 43vw;
-  height: 10vh;
-  width: 15vw;
-  background-color:#0c0159;
-  border: solid rgb(255, 255, 255) 5px;
-  z-index: 400;
-  display: none;
-}
-.add_cat_form_wrapper-active{
-  display:inline;
-}
-.add_cat_form{
-  flex-direction: column;
-  display: flex;
-  align-items: flex-start;
-  gap: 5px;
-  position:fixed;
-  background-color: #0c0159;
-  width: 15vw;
-}
-/*  */
+
 .comments{
   height: 83vh;
   position: fixed;
@@ -255,8 +231,7 @@ section {
   overflow-y: scroll;
 }
 .channel_about{
-  overflow: hidden;
-  height:unset;
+  height:fit-content;
 }
 .channel_subbed_on{
   height: 20vh;
@@ -303,14 +278,16 @@ div.underhat{
   gap: 15px;
 }
 /* playlist  */
-div.playlist_top{
+.playlist_top{
   width: 100vw;
   position: relative;
   justify-content: left;
   height: 8vh;
   border-bottom: 5px solid #000000;
   display: flex;
+  overflow-x: scroll;
 }
+
 
 .playlist_top h2{
   position: relative;
@@ -427,7 +404,10 @@ color: white;
   margin-left: 2vw;
 }
 .content_active {
-  transform: translateX(15%);
+  transform: translateX(15vw);
+  transition: 0.5s;
+  width: 85vw;
+  
 }
 
 

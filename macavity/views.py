@@ -19,7 +19,6 @@ class Subscribes(VideoDataMixin, LoginRequiredMixin, ListView):
     model = Video
     template_name = 'macavity/subscribes.html'
     context_object_name = 'videos'
-
     def get_queryset(self):
         #check servises.py to get the raw query
         self.channels_subscribed_at = get_channels_subscribed_at(self.request.user.pk)
@@ -27,7 +26,7 @@ class Subscribes(VideoDataMixin, LoginRequiredMixin, ListView):
         queryset = self.get_video_queryset().filter(
             author_channel__pk__in = self.channels_subscribed_at, 
             published=True
-        )
+        ).order_by('-publish_date')
 
         self.queryset =  queryset
         return super().get_queryset()
@@ -245,7 +244,8 @@ class PlaylistView(VideoDataMixin, ListView):
             'channel_playlist__avatar',
             'playlist_name', 
             'slug',
-            'algo_playlist'
+            'algo_playlist',
+            'hidden'
         ).prefetch_related(
             Prefetch('included_video', queryset=selected_videos)
         ).get(
@@ -257,7 +257,7 @@ class PlaylistView(VideoDataMixin, ListView):
 
 class RegisterUser(CreateView):
     form_class = RegisterUserForm
-    template_name = 'macavity/register.html'
+    template_name = 'macavity/forms/register.html'
 
     def form_valid(self, form):
         user = form.save()
@@ -266,7 +266,7 @@ class RegisterUser(CreateView):
 
 class LoginUser(LoginView):
     form_class = LoginUserForm
-    template_name = 'macavity/login.html'
+    template_name = 'macavity/forms/login.html'
 
     def get_success_url(self):
         return reverse_lazy('home')
@@ -278,15 +278,16 @@ def logout_user(request):
 
 class AddVideo(LoginRequiredMixin, CreateView):
     form_class = AddVideoForm
-    template_name = 'macavity/addvideo.html'
+    template_name = 'macavity/forms/addvideo.html'
 
     def post(self, request, *args, **kwargs):
 
         if check_ajax_request_post(request=request):
             return handle_post_request_add_category(request=request)
+        
         else:
-            self.object = None
-            return super().post(request, *args, **kwargs)
+
+            return super().post(self, request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -298,7 +299,7 @@ class AddVideo(LoginRequiredMixin, CreateView):
 
 class AddPlaylist(LoginRequiredMixin, CreateView):
     form_class = AddPlaylistForm
-    template_name = 'macavity/addplaylist.html'
+    template_name = 'macavity/forms/addplaylist.html'
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -307,7 +308,7 @@ class AddPlaylist(LoginRequiredMixin, CreateView):
 
 class ChangeChannel(LoginRequiredMixin, FormView):
     form_class = ChangeChannel
-    template_name = 'macavity/changechannel.html'
+    template_name = 'macavity/forms/changechannel.html'
     
     def get_form(self, form_class=ChangeChannel):
         channel = Channel.objects.get(username=self.request.user.username)
@@ -322,7 +323,7 @@ class ChangeChannel(LoginRequiredMixin, FormView):
 
 class ChangePlaylist(LoginRequiredMixin, FormView):
     form_class = Playlist
-    template_name = 'macavity/changeplaylist.html'
+    template_name = 'macavity/forms/changeplaylist.html'
     
     def get_form(self, form_class=ChangePlaylist):
         playlist = Playlist.objects.get(slug=self.kwargs['slug'])
@@ -341,7 +342,7 @@ class ChangePlaylist(LoginRequiredMixin, FormView):
 
 class ChangeVideo(LoginRequiredMixin, FormView):
     form_class = Video
-    template_name = 'macavity/changevideo.html'
+    template_name = 'macavity/forms/changevideo.html'
     
     def post(self, request, *args, **kwargs):
         if check_ajax_request_post(request=request):

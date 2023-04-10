@@ -1,4 +1,17 @@
 {% extends 'macavity/base.html' %}
+{% load static %}
+{% load macavity_tags %}
 {% block content %}
-
+<div class="content">
+    <section class="videos_list">
+        <div class="playlist_top"> 
+            <h2>
+                <h2>
+                    {{cat.category_name}}
+                </h2>
+            </h2>
+        </div>
+        {% draw_videos cat.videos.all %}
+    </section>
+</div>
 {% endblock %}
