@@ -1,0 +1,33 @@
+{% extends 'macavity/base.html' %}
+{% block content %}
+<section class="register_login">
+    <div class="register-form">
+        <form class="form_register" id="add_cat_form">
+            {% csrf_token %}
+            <label for="add_cat_name">Название категории</label>
+            <input type="text" name="add_cat_name" id="add_cat_name" required maxlength="255">
+            <button type="submit" name="add_cat_btn" id="add_cat_btn">Создать категорию</button>
+        </form>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-error">
+            {{ form.non_field_errors }}
+        </div>
+        {% for f in form %}
+            <div class = "register-form">
+                <p class="form_register">
+                    <label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>
+                    {{ f }}
+                </p>
+            </div>
+            <div class="form-error">
+                {{ f.errors }}
+            </div>
+        {% endfor %}
+        {% if form %}
+            <button type="submit">Сохранить</button>
+        {% endif %}
+    </form>
+</section>
+{% endblock %}
