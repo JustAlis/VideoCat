@@ -8,7 +8,6 @@ def draw_videos(context, context_object = None):
     if context_object is None: 
         return context
     else:
-        print(context_object)
         return {
             'videos': context_object
         }
