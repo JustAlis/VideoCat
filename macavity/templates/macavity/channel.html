@@ -42,7 +42,7 @@
     </section>
     {% if channel.videos.all %}
         <section class="channel_list">
-            <h2>Видео</h2>
+            <h2><a href="{% url 'videos' channel.slug %}">Видео</a></h2>
             <div class="c_channel">
                 {% for video in channel.videos.all %}
                     {% if video.published or channel.username == request.user.username %}
@@ -53,7 +53,14 @@
                             {% else %}
                                 <a href="{% url 'video' video.slug %}"><img src="{% static 'macavity/images/black_back.jpg' %}" width="320" height="180"></a>
                             {% endif %}
-                            {{video.publish_date}}
+                            <div class="video_small_stats_date_views">
+                                {{video.publish_date}} 
+                                просмотры: {{video.views}}
+                            </div>
+                            <div class="video_small_stats">
+                                лайки: {{video.likes}}
+                                дизлайки: {{video.dislikes}}  
+                            </div>
                         </div>  
                     {% endif %} 
                 {% endfor %}
@@ -61,12 +68,12 @@
         </section>
     {% endif %}
     <section class="channel_list">
-        <h2>Плейлисты</h2>
+        <h2><a href="{% url 'playlists' channel.slug %}">Плейлисты</a></h2>
         <div class="c_channel">
             {% for playlist in channel.playlists.all %}
                 {% if not playlist.hidden or channel.username == request.user.username %}
                     <div class="v">
-                        {{ playlist.playlist_name }}
+                        <a href="{% url 'playlist' playlist.slug %}">{{playlist.playlist_name}}</a>
                         {% if playlist.playlist_picture %}
                             <a href="{% url 'playlist' playlist.slug %}"><img src="{{playlist.playlist_picture.url}}" width="320" height="180"></a>
                         {% else %}
@@ -81,8 +88,15 @@
         <h2>Подписки</h2>
         <h2>
             {% for channel in subscribed_at %}
-                <a href="{% url 'channel' channel.slug %}"> {{channel.username}}</a>
-                {{channel.sub_num}}
+                <a href="{% url 'channel' channel.slug %}">
+                    {% if channel.avatar %}
+                        <img src="{{channel.avatar.url}}" width="45px">
+                    {% else %}
+                        <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                    {% endif %}
+                     {{channel.username}}
+                     {{channel.sub_num}}
+                </a>
             {% endfor %}
         </h2>
     </section>

@@ -6,8 +6,6 @@ from .utils import unique_slugify
 from django.utils import timezone
 from django.core.validators import FileExtensionValidator
 from django.db.models.signals import pre_save, post_delete, post_save
-#raw query for sub system, to delete all the relations when channel is deleted
-from .servises import remove_all_subscriptions
 
 def path_to_avatars(instance, filename):
     return 'avatars/{}/{}'.format(instance.username, filename)
@@ -27,9 +25,9 @@ class Channel(AbstractUser):
 
     sex = models.CharField(max_length=1, choices=sex_choises, verbose_name = 'sex', blank=True, null=True)
 
-    # !!!WARNING!!! do not use standart methodsfor this field. Standart behavior doesnt work for this priject
+    # !!!WARNING!!! do not use standard methods for this field. Standart behavior doesnt work for this priject
     # check servises.py with slq raw queries
-    sub_system = models.ManyToManyField('self')
+    sub_system = models.ManyToManyField('self', symmetrical=False, related_name='subscribed_at')
 
     date_of_birth = models.DateField(verbose_name = 'date_of_birth', blank=True, null=True)
 
@@ -180,4 +178,21 @@ def slugify_cat(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=Channel)
 def slugify_cat(sender, instance, **kwargs):
-    remove_all_subscriptions(instance.id)
+    if instance.hat:
+        instance.hat.delete(save=False)
+
+    if instance.avatar:
+        instance.avatar.delete(save=False)
+
+@receiver(post_delete, sender=Video)
+def delete_files_video(sender, instance, *args, **kwargs):
+    if instance.content:
+        instance.content.delete(save=False)
+
+    if instance.preview:
+        instance.preview.delete(save=False)
+    
+@receiver(post_delete, sender=Playlist)
+def delete_files_video(sender, instance, *args, **kwargs):
+    if instance.playlist_picture:
+        instance.playlist_picture.delete(save=False)

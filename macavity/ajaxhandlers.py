@@ -5,8 +5,6 @@ from .forms import *
 import urllib.parse
 from django.template.loader import render_to_string
 from django.db.models import Q
-#raw sl queries for sub system
-from .servises import raw_dislikes_into_likes, raw_likes_into_dislikes, subscribe,remove_subscription, check_if_subscribed, get_number_of_subs
 from .mymixins import *
 from django.db import transaction
 
@@ -23,21 +21,15 @@ def handle_get_request_videoplayer(request, slug):
         return JsonResponse({"html": playlists})
     
     elif request.headers.get('get-requets') == 'subscribe':
-        channels = list(Channel.objects.filter(
-            Q(username=request.user.username)|Q(pk = Video.objects.get(slug = slug).author_channel.pk)
-        ))
         
-        if channels[1] == request.user.username:
-            subscriber, subscribed_at = channels[1], channels[0]
-        else:
-            subscriber, subscribed_at = channels[0], channels[1]
+        subscribed_at = Video.objects.get(slug = slug).author_channel
+        subscriber = request.user
 
-        if check_if_subscribed(subscriber_id=subscriber.pk, subscribed_at_id=subscribed_at.pk):
-            remove_subscription(subscriber_id=subscriber.pk, subscribed_at_id=subscribed_at.pk)
+        if subscriber in subscribed_at.sub_system.all(): 
+            subscribed_at.sub_system.remove(subscriber)
         else:
-            subscribe(subscriber_id=subscriber.pk, subscribed_at_id=subscribed_at.pk)
-
-        new_sub_num =get_number_of_subs(subscribed_at.pk)
+            subscribed_at.sub_system.add(subscriber)
+        new_sub_num = subscribed_at.sub_system.count()
         return JsonResponse({"sub_num": 'Подписчики: %s' % new_sub_num})
         
 
@@ -72,7 +64,7 @@ def handle_post_request_videoplayer(request, user, comments_queryset, slug):
             else:
                 liked_playlist, disliked_playlist = algo_playlists[0], algo_playlists[1]
 
-            with transaction.atomic():                
+            with transaction.atomic():              
                 liked_video = Video.objects.filter(
                     pk=data['video_like'], 
                     playlists=liked_playlist
@@ -82,7 +74,9 @@ def handle_post_request_videoplayer(request, user, comments_queryset, slug):
                     liked_video = Video.objects.get(pk=data['video_like'])
 
                     if liked_video in disliked_playlist.included_video.all():
-                        raw_dislikes_into_likes(disliked_playlist.pk, liked_video.pk, liked_playlist.pk)
+
+                        disliked_playlist.included_video.remove(liked_video)
+                        liked_playlist.included_video.add(liked_video)
                         liked_video.dislikes-=1
                         liked_video.likes += 1
                         liked_video.save()
@@ -128,7 +122,8 @@ def handle_post_request_videoplayer(request, user, comments_queryset, slug):
                     disliked_video = Video.objects.get(pk=data['video_dislike'])
 
                     if disliked_video in liked_playlist.included_video.all():
-                        raw_likes_into_dislikes(disliked_playlist.pk, disliked_video.pk, liked_playlist.pk)
+                        disliked_playlist.included_video.add(disliked_video)
+                        liked_playlist.included_video.remove(disliked_video)
                         disliked_video.likes-=1
                         disliked_video.dislikes += 1
                         disliked_video.save()
@@ -173,22 +168,17 @@ def check_ajax_request_get_videoplayer(request):
     else:
         return False
 
-def add_subscriber_channel(slug, username):
-    channels = list(Channel.objects.filter(
-        Q(username=username)|Q(slug=slug))
-    )
+def add_subscriber_channel(slug, user):
+    subscribed_at = Channel.objects.get(slug = slug)
+    subscriber = user
+
+    if subscriber in subscribed_at.sub_system.all(): 
+        subscribed_at.sub_system.remove(subscriber)
+    else:
+        subscribed_at.sub_system.add(subscriber)
     
-    if channels[1] == username:
-        subscriber, subscribed_at = channels[1], channels[0]
-    else:
-        subscriber, subscribed_at = channels[0], channels[1]
-
-    if check_if_subscribed(subscriber_id=subscriber.pk, subscribed_at_id=subscribed_at.pk):
-        remove_subscription(subscriber_id=subscriber.pk, subscribed_at_id=subscribed_at.pk)
-    else:
-        subscribe(subscriber_id=subscriber.pk, subscribed_at_id=subscribed_at.pk)
-
-    new_sub_num =get_number_of_subs(subscribed_at.pk)
+    new_sub_num = subscribed_at.sub_system.count()
+    #new_sub_num =get_number_of_subs(subscribed_at.pk)
     return JsonResponse({"sub_num": new_sub_num})
 
 def handle_post_request_add_category(request):

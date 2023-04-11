@@ -1,0 +1,12 @@
+{% extends 'macavity/base.html' %}
+{% block content %}
+{% if user.is_authenticated and user == object.author_channel%}
+    <section class="register_login">
+        <h2>Вы действительно хотите удалить это видео?</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="submit" value="Удалить">
+        </form>
+    </section>
+{% endif %}
+{% endblock %}

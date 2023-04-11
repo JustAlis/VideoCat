@@ -234,8 +234,14 @@ section {
   height:fit-content;
 }
 .channel_subbed_on{
-  height: 20vh;
+  height: 15vh;
 }
+.channel_subbed_on a{
+  display:inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .channel_hatless{
   z-index: 100;
   margin-top:8vh;
@@ -282,12 +288,16 @@ div.underhat{
   width: 100vw;
   position: relative;
   justify-content: left;
-  height: 8vh;
+  min-height: 8vh;
   border-bottom: 5px solid #000000;
   display: flex;
   overflow-x: scroll;
 }
-
+.playlist_top a{
+  display:inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .playlist_top h2{
   position: relative;
@@ -296,7 +306,10 @@ div.underhat{
   align-items: center;
   gap: 15px;
 }
-
+#margin_top {
+  color: #ffffff;
+  margin-top: 65px;
+}
 /* wrappers for videos and playlists in categories, channels, and playlists*/
 div.v{
   position: relative;

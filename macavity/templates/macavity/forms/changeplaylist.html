@@ -21,5 +21,8 @@
             <button type="submit">Сохранить</button>
         {% endif %}
     </form>
+    <a href="{% url 'playlistdelete' view.kwargs.slug %}">  
+        <button>Удалить плейлист</button>
+    </a>
 </section>
 {% endblock %}

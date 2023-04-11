@@ -1,0 +1,13 @@
+{% extends 'macavity/base.html' %}
+{% block content %}
+{% if user.is_authenticated and user == object %}
+    <section class="register_login">
+        <h2>Вы действительно хотите свой аккаунт?</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Confirm">
+        </form>
+    </section>
+{% endif %}
+{% endblock %}

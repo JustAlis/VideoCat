@@ -29,5 +29,8 @@
             <button type="submit">Сохранить</button>
         {% endif %}
     </form>
+    <a href="{% url 'videodelete' view.kwargs.slug %}">  
+        <button>Удалить видео</button>
+    </a>
 </section>
 {% endblock %}

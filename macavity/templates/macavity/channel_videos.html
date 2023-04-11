@@ -1,0 +1,27 @@
+{% extends 'macavity/base.html' %}
+{% load static %}
+{% load macavity_tags %}
+{% block content %}
+<div class="content">
+    <section class="videos_list">
+        <div class="playlist_top">
+            <h2>
+                Все видео 
+                <a href = "{% url 'channel' channel.slug %}">
+                    {{channel.username}}
+                    {% if channel.avatar %}
+                            <img src="{{channel.avatar.url}}" width="45px">
+                    {% else %}
+                            <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                    {% endif %}
+                </a>
+                Подписчики: {{channel.sub_num}}
+                {% if request.user == channel%}
+                    <a href="{% url 'addvideo' %}">Добавить видео</a>
+                {% endif %}
+            </h2>
+        </div>
+        {% draw_videos %}
+    </section>
+</div>
+{% endblock %}

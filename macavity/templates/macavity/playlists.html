@@ -1,0 +1,62 @@
+{% extends 'macavity/base.html'   %}
+{% load static %}
+{% block content %}
+<div class="content">
+    <div class="playlist_top" id="margin_top">
+        <h2>
+            Все плейлисты 
+            <a href = "{% url 'channel' channel.slug %}">
+                {{channel.username}}
+                {% if channel.avatar %}
+                        <img src="{{channel.avatar.url}}" width="45px">
+                {% else %}
+                        <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                {% endif %}
+            </a>
+            Подписчики: {{channel.sub_num}}
+            {% if request.user == channel%}
+                <a href="{% url 'addplaylist' %}">Добавить плейлист</a>
+            {% endif %}
+        </h2>
+    </div>
+    {% for playlist in playlists %}
+        {% if playlist.included_video.all%}
+            <section class="categories_section">
+                <h2>
+                    <a href="{% url 'playlist' playlist.slug %}">
+                        {{ playlist.playlist_name }}
+                    </a>
+                </h2>
+                <div class="c">
+                    {% for video in playlist.included_video.all %}
+                        <div class="v">
+                            {{ video.video_title }}
+                            {% if video.preview %}
+                                <a href="{% url 'video' video.slug %}"><img src="{{video.preview.url}}" width="320" height="180"></a>
+                            {% else %}
+                                <a href="{% url 'video' video.slug %}"><img src="{% static 'macavity/images/black_back.jpg' %}" width="320" height="180"></a>
+                            {% endif %}
+                            <div class=""video_small_stats_date_views"">
+                                {{video.publish_date}} 
+                                просмотры: {{video.views}}
+                            </div>
+                            <div class="video_small_stats">
+                                <a href="{% url 'channel' video.author_channel.slug %}">
+                                    {% if video.author_channel.avatar %}
+                                        <img src="{{video.author_channel.avatar.url}}" width="45px">
+                                    {% else %}
+                                        <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                                    {% endif %}
+                                    {{video.author_channel.username}}
+                                </a>
+                                лайки: {{video.likes}}
+                                дизлайки: {{video.dislikes}}  
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

@@ -7,7 +7,15 @@
         <div class="playlist_top">
             <h2>
                 {% for channel in subscribed_at %}
-                    <a href="{% url 'channel' channel.slug %}">{{channel.username}}</a>
+                    <a href="{% url 'channel' channel.slug %}">
+                        {% if channel.avatar %}
+                            <img src="{{channel.avatar.url}}" width="45px">
+                        {% else %}
+                            <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                        {% endif %}
+                        {{channel.username}}
+                        {{channel.sub_num}}
+                    </a>
                 {% endfor %}
             </h2>
         </div>

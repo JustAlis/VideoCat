@@ -1,15 +1,14 @@
+import os
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, FormView
+from django.views.generic import ListView, CreateView, FormView, DeleteView
 from .models import *
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout, login
 from .forms import *
 from django.db.models import Prefetch, Count
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import FileResponse
-#raw sql query for sub system
-from .servises import get_channels_subscribed_at
+from django.http import FileResponse, HttpResponseRedirect
 from .mymixins import *
 #handlers for ajax requests here
 from .ajaxhandlers import *
@@ -20,11 +19,10 @@ class Subscribes(VideoDataMixin, LoginRequiredMixin, ListView):
     template_name = 'macavity/subscribes.html'
     context_object_name = 'videos'
     def get_queryset(self):
-        #check servises.py to get the raw query
-        self.channels_subscribed_at = get_channels_subscribed_at(self.request.user.pk)
+
         #check mixin
         queryset = self.get_video_queryset().filter(
-            author_channel__pk__in = self.channels_subscribed_at, 
+            author_channel__in = self.request.user.subscribed_at.all(), 
             published=True
         ).order_by('-publish_date')
 
@@ -33,15 +31,16 @@ class Subscribes(VideoDataMixin, LoginRequiredMixin, ListView):
         
     def get_context_data(self,**kwargs):
         data = super().get_context_data(**kwargs)
+
         data['subscribed_at'] = Channel.objects.only(
-            'username', 
+            'username',
             'avatar', 
             'slug'
         ).annotate(
             sub_num=Count('sub_system')
         ).filter(
-            pk__in = self.channels_subscribed_at
-        )
+            id__in=self.request.user.subscribed_at.all()
+        ) 
 
         return data
 
@@ -56,7 +55,33 @@ class HomePage(VideoDataMixin, ListView):
 
         self.queryset =  queryset
         return super().get_queryset()
+    
+class VideosView(VideoDataMixin, ListView):
+    model = Video
+    template_name = 'macavity/channel_videos.html'
+    context_object_name = 'videos'
+    
+    def get_queryset(self):
+        #check mixin
+        queryset = self.get_video_queryset().filter(author_channel__slug=self.kwargs['slug'])
+        
+        self.queryset =  queryset
+        return super().get_queryset()
+    
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['channel'] = Channel.objects.only(
+            'username', 
+            'avatar', 
+            'slug'
+        ).annotate(
+            sub_num=Count('sub_system')
+        ).get(
+            slug=self.kwargs['slug']
+        )
 
+        return data
+    
 class SearchView(VideoDataMixin, ListView):
     template_name = 'macavity/search.html'
     model = Video
@@ -148,7 +173,7 @@ class ChannelView(ListView):
     def get(self, request, *args, **kwargs):
         #check ajaxhandlers
         if check_ajax_request_get_videoplayer(request):
-            return add_subscriber_channel(username=self.request.user.username, slug=kwargs['slug'])
+            return add_subscriber_channel(user=request.user, slug=kwargs['slug'])
         else:
             return super().get(self, request, *args, **kwargs)
 
@@ -169,7 +194,8 @@ class ChannelView(ListView):
             'hat', 
             'avatar', 
             'description', 
-            'pk'
+            'pk',
+            'slug'
         ).annotate(
             sub_num=Count('sub_system')
         ).prefetch_related(
@@ -190,7 +216,7 @@ class ChannelView(ListView):
             ).annotate(
                 sub_num=Count('sub_system')
             ).filter(
-                pk__in = get_channels_subscribed_at(self.queryset.pk)
+                id__in=self.request.user.subscribed_at.all()
             )
         
         return data
@@ -211,6 +237,34 @@ class CategoriesView(VideoDataMixin, ListView):
 
         self.queryset =  queryset
         return super().get_queryset()
+    
+class PlaylistsView(VideoDataMixin, ListView):
+    model = Playlist
+    template_name = 'macavity/playlists.html'
+    context_object_name = 'playlists'
+
+    def get_queryset(self):
+        playlists = Playlist.objects.all().filter(channel_playlist__slug=self.kwargs['slug'])
+
+        selected_videos = self.get_video_queryset().filter(published = True)
+
+        queryset = playlists.prefetch_related(
+            Prefetch('included_video', queryset=selected_videos)
+        )  
+
+        self.queryset =  queryset
+        return super().get_queryset()
+    
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['channel'] = Channel.objects.only(
+            'username', 
+            'avatar', 
+            'slug'
+        ).annotate(sub_num=Count('sub_system')
+        ).get(slug=self.kwargs['slug'])
+
+        return data
     
 class CategoryView(VideoDataMixin,ListView):
     model = Category
@@ -298,6 +352,7 @@ class AddVideo(LoginRequiredMixin, CreateView):
         return reverse_lazy('video', kwargs={'slug': self.object.slug})
 
 class AddPlaylist(LoginRequiredMixin, CreateView):
+
     form_class = AddPlaylistForm
     template_name = 'macavity/forms/addplaylist.html'
 
@@ -305,6 +360,9 @@ class AddPlaylist(LoginRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         self.object.channel_playlist = self.request.user
         return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('playlist', kwargs={'slug': self.object.slug})
 
 class ChangeChannel(LoginRequiredMixin, FormView):
     form_class = ChangeChannel
@@ -315,6 +373,30 @@ class ChangeChannel(LoginRequiredMixin, FormView):
         return form_class(instance=channel, **self.get_form_kwargs())
 
     def form_valid(self, form):
+        channel = self.request.user
+
+        cleaned_avatar = False
+        try:
+            if self.request.POST['avatar-clear'] == 'on':
+                cleaned_avatar = True
+        except:
+            pass
+        avatar = os.path.basename(channel.avatar.name)
+        new_avatar = self.request.FILES.get('avatar')
+        if (avatar and avatar != new_avatar and new_avatar is not None) or (cleaned_avatar):
+            channel.avatar.delete(save=False)
+
+        cleaned_hat = False
+        try:
+            if self.request.POST['hat-clear'] == 'on':
+                cleaned_hat = True
+        except:
+            pass
+        hat = os.path.basename(channel.hat.name)
+        new_hat = self.request.FILES.get('hat')
+        if (hat and hat != new_hat and new_hat is not None) or (cleaned_hat):
+            channel.hat.delete(save=False)
+
         self.object = form.save(commit=True)
         return super().form_valid(form)
     
@@ -327,13 +409,27 @@ class ChangePlaylist(LoginRequiredMixin, FormView):
     
     def get_form(self, form_class=ChangePlaylist):
         playlist = Playlist.objects.get(slug=self.kwargs['slug'])
-
         if playlist.channel_playlist.username == self.request.user.username:
             return form_class(instance=playlist, **self.get_form_kwargs())
         else: 
             return None
 
     def form_valid(self, form):
+        playlist = Playlist.objects.get(slug=self.kwargs['slug'])
+
+        playlist_picture =os.path.basename(playlist.playlist_picture.name)
+        new_playlist_picture = self.request.FILES.get('playlist_picture')
+
+        cleaned_playlist_picture = False
+        try:
+            if self.request.POST['playlist_picture-clear'] == 'on':
+                cleaned = True
+        except:
+            pass
+
+        if (playlist_picture and playlist_picture != new_playlist_picture and new_playlist_picture is not None) or (cleaned_playlist_picture):
+            playlist.playlist_picture.delete(save=False)
+
         self.object = form.save(commit=True)
         return super().form_valid(form)
     
@@ -358,8 +454,61 @@ class ChangeVideo(LoginRequiredMixin, FormView):
             return None
 
     def form_valid(self, form):
+        video = Video.objects.get(slug=self.kwargs['slug'])
+        
+        cleaned_preview = False
+        try:
+            if self.request.POST['preview-clear'] == 'on':
+                cleaned_preview = True
+        except:
+            pass
+        preview = os.path.basename(video.preview.name)
+        new_preview = self.request.FILES.get('preview')
+        if (preview and preview != new_preview and new_preview is not None) or (cleaned_preview):
+            video.preview.delete(save=False)
+
         self.object = form.save(commit=True)
         return super().form_valid(form)
     
     def get_success_url(self):
         return reverse_lazy('video', kwargs={'slug': self.kwargs['slug']})
+
+
+class ChannelDelete(LoginRequiredMixin,DeleteView):
+    template_name = 'macavity/forms/deletechannel.html'
+    
+    def get_queryset(self):
+        queryset = self.request.user
+        self.queryset = queryset
+        return super().get_queryset(self.queryset)
+    
+    def get_success_url(self):
+        logout(self.request)
+        return redirect('login')
+
+class PlaylistDelete(LoginRequiredMixin,DeleteView):
+    template_name = 'macavity/forms/deleteplaylist.html'
+    
+    def get_queryset(self):
+        queryset = Playlist.objects.filter(slug=self.kwargs['slug'])
+        self.queryset =  queryset
+        return super().get_queryset()
+
+    def get_success_url(self):
+        return reverse_lazy('channel', kwargs={'slug': self.request.user.slug})
+
+
+class VideoDelete(LoginRequiredMixin,DeleteView):
+    template_name = 'macavity/forms/deletevideo.html'
+
+    def get_queryset(self):
+        queryset = Video.objects.filter(slug=self.kwargs['slug'])
+        self.queryset =  queryset
+        return super().get_queryset()
+    
+    def get_success_url(self):
+        return reverse_lazy('channel', kwargs={'slug': self.request.user.slug})
+
+
+def redirect_to_playlist(request, path):
+    pass

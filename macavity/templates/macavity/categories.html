@@ -3,27 +3,43 @@
 {% block content %}
 <div class="content">
     {% for category in cats %}
-        {% if forloop.first %}
-            <section class="categories_section_top">
-        {% else %}
-            <section class="categories_section">
+        {% if category.videos.all %}
+            {% if forloop.first %}
+                <section class="categories_section_top">
+            {% else %}
+                <section class="categories_section">
+            {% endif %}
+                <h2><a href="{% url 'category' category.slug %}"> {{ category.category_name }}</a></h2>
+                    <div class="c">
+                        {% for video in category.videos.all %}
+                            <div class="v">
+                                {{ video.video_title }}
+                                {% if video.preview %}
+                                    <a href="{% url 'video' video.slug %}"><img src="{{video.preview.url}}" width="320" height="180"></a>
+                                {% else %}
+                                    <a href="{% url 'video' video.slug %}"><img src="{% static 'macavity/images/black_back.jpg' %}" width="320" height="180"></a>
+                                {% endif %}
+                                <div class=""video_small_stats_date_views"">
+                                    {{video.publish_date}} 
+                                    просмотры: {{video.views}}
+                                </div>
+                                <div class="video_small_stats">
+                                    <a href="{% url 'channel' video.author_channel.slug %}">
+                                        {% if video.author_channel.avatar %}
+                                            <img src="{{video.author_channel.avatar.url}}" width="45px">
+                                        {% else %}
+                                            <img src="{% static 'macavity/images/logo.jpg' %}" width="45px">
+                                        {% endif %}
+                                        {{video.author_channel.username}}
+                                    </a>
+                                    лайки: {{video.likes}}
+                                    дизлайки: {{video.dislikes}}  
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
         {% endif %}
-                <h2>{{ category.category_name }}</h2>
-                <div class="c">
-                    {% for video in category.videos.all %}
-                        <div class="v">
-                            {{ video.video_title }}
-                            {% if video.preview %}
-                                <a href="{% url 'video' video.slug %}"><img src="{{video.preview.url}}" width="320" height="180"></a>
-                            {% else %}
-                                <a href="{% url 'video' video.slug %}"><img src="{% static 'macavity/images/black_back.jpg' %}" width="320" height="180"></a>
-                            {% endif %}
-                            {{video.publish_date}}
-                            <a href="{% url 'channel' video.author_channel.slug %}">{{video.author_channel.username}}</a>
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
     {% endfor %}
 </div>
 {% endblock %}

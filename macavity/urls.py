@@ -17,8 +17,13 @@ urlpatterns = [
     path('changeplaylist/<slug:slug>/', ChangePlaylist.as_view(), name = 'changeplaylist'),
     path('changevideo/<slug:slug>/', ChangeVideo.as_view(), name = 'changevideo'),
     path('addplaylist/', AddPlaylist.as_view(), name = 'addplaylist'),
-    path('schunks/<slug:slug>/', video_by_chunks, name='chunks'),
-    path('subscribes/', Subscribes.as_view(), name = 'subscribes')
+    path('chunks/<slug:slug>/', video_by_chunks, name='chunks'),
+    path('subscribes/', Subscribes.as_view(), name = 'subscribes'),
+    path('playlists/<slug:slug>/', PlaylistsView.as_view(), name='playlists'),
+    path('videos/<slug:slug>/', VideosView.as_view(), name='videos'),
+    path('channeldelete/<slug:slug>/', ChannelDelete.as_view(), name='channeldelete'),
+    path('playlistdelete/<slug:slug>/', PlaylistDelete.as_view(), name='playlistdelete'),
+    path('videodelete/<slug:slug>/', VideoDelete.as_view(), name='videodelete'),
 ]
 
 # urlpatterns = [
