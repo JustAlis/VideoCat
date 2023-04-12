@@ -13,7 +13,7 @@ ENV
 
 BD SCHEMA
 
-    !https://github.com/JustAlis/VideoCat/blob/main/db_schema.png
+    !(https://github.com/JustAlis/VideoCat/blob/main/db_schema.png)
 
 HOW TO RUN
 
