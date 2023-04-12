@@ -12,8 +12,7 @@ ENV
     -django-debug-toolbar
 
 BD SCHEMA
-
-    ![schema](db_schema.png)
+![schema](db_schema.png)
 
 HOW TO RUN
 
