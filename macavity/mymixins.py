@@ -1,6 +1,7 @@
 from .models import *
 from django.db.models import Prefetch, Count
-
+#all parametrs for video I need to get for queries
+#sometimes it is 'overkill', but this is for the reason of standartisation and to make code looking better 
 video_params = [
     'author_channel__slug',
     'author_channel__avatar', 
@@ -18,6 +19,7 @@ video_params = [
     'author_channel__id',
     'published'
 ]
+#all video I need to get for queries
 class VideoDataMixin:
     def get_video_queryset(self, **kwargs):
         video_queryset = Video.objects.select_related(
@@ -28,6 +30,7 @@ class VideoDataMixin:
 
         return video_queryset
     
+#all comments with all params I need to get for queries  
 class CommentDataMixin:
     def get_comment_queryset(self, **kwargs):
         comments_queryset = Comment.objects.select_related(

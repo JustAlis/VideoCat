@@ -143,7 +143,6 @@ section {
   width: 20vw;
 }
 
-
 .comments{
   height: 83vh;
   position: fixed;
@@ -232,12 +231,17 @@ section {
   overflow-y: scroll;
 }
 .channel_about{
-  overflow: hidden;
-  height:unset;
+  height:fit-content;
 }
 .channel_subbed_on{
-  height: 20vh;
+  height: 15vh;
 }
+.channel_subbed_on a{
+  display:inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .channel_hatless{
   z-index: 100;
   margin-top:8vh;
@@ -280,13 +284,19 @@ div.underhat{
   gap: 15px;
 }
 /* playlist  */
-div.playlist_top{
+.playlist_top{
   width: 100vw;
   position: relative;
   justify-content: left;
-  height: 8vh;
+  min-height: 8vh;
   border-bottom: 5px solid #000000;
   display: flex;
+  overflow-x: scroll;
+}
+.playlist_top a{
+  display:inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .playlist_top h2{
@@ -296,7 +306,10 @@ div.playlist_top{
   align-items: center;
   gap: 15px;
 }
-
+#margin_top {
+  color: #ffffff;
+  margin-top: 65px;
+}
 /* wrappers for videos and playlists in categories, channels, and playlists*/
 div.v{
   position: relative;
@@ -404,7 +417,10 @@ color: white;
   margin-left: 2vw;
 }
 .content_active {
-  transform: translateX(15%);
+  transform: translateX(15vw);
+  transition: 0.5s;
+  width: 85vw;
+  
 }
 
 

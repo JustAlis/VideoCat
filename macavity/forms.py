@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Channel, Video, Playlist, Comment
 from datetime import date
 
+#date widget as sugested django documentation
 class DateSelectorWidget(forms.MultiWidget):
     def __init__(self, attrs=None):
         days = [(day, day) for day in range(1, 32)]
@@ -28,6 +29,8 @@ class DateSelectorWidget(forms.MultiWidget):
         # DateField expects a single string that it can parse into a date.
         return '{}-{}-{}'.format(year, month, day)
 
+#I do really think, that there is nothing to talk about here.
+#Just forms and fields, nothing special
 sex_choises = (
 ('M', 'Male'),
 ('F', 'Female'),

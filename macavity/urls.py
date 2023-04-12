@@ -24,7 +24,7 @@ urlpatterns = [
     path('channeldelete/<slug:slug>/', ChannelDelete.as_view(), name='channeldelete'),
     path('playlistdelete/<slug:slug>/', PlaylistDelete.as_view(), name='playlistdelete'),
     path('videodelete/<slug:slug>/', VideoDelete.as_view(), name='videodelete'),
+    path('watched/', redirect_to_watched_playlist, name='watched'),
+    path('liked/', redirect_to_liked_playlist, name='liked'),
 ]
 
-# urlpatterns = [
-#     path('addpage/', AddPage.as_view(), name='add_page'),

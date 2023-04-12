@@ -7,13 +7,16 @@ from django.utils import timezone
 from django.core.validators import FileExtensionValidator
 from django.db.models.signals import pre_save, post_delete, post_save
 
+#generate unique path fo channel avatar
 def path_to_avatars(instance, filename):
     return 'avatars/{}/{}'.format(instance.username, filename)
-
+#generate unique path fo channel hat
 def path_to_hats(instance, filename):
     return 'hats/{}/{}'.format(instance.username, filename)
 
-
+#There is nothing to talk about here, just models and fields, but there is something to discribe aout signals
+#Check bottom with signals
+#names of fields speaks for themselves
 sex_choises = (
 ('M', 'Male'),
 ('F', 'Female'),
@@ -25,8 +28,6 @@ class Channel(AbstractUser):
 
     sex = models.CharField(max_length=1, choices=sex_choises, verbose_name = 'sex', blank=True, null=True)
 
-    # !!!WARNING!!! do not use standard methods for this field. Standart behavior doesnt work for this priject
-    # check servises.py with slq raw queries
     sub_system = models.ManyToManyField('self', symmetrical=False, related_name='subscribed_at')
 
     date_of_birth = models.DateField(verbose_name = 'date_of_birth', blank=True, null=True)
@@ -92,7 +93,7 @@ class Playlist(models.Model):
     playlist_picture = models.ImageField(upload_to='playlists/%Y/%m/%d', blank=True, null=True, verbose_name = 'playlist_picture', 
                                          validators=[FileExtensionValidator(allowed_extensions=['jpg'])])
     hidden = models.BooleanField(default=False, verbose_name = 'published')
-    
+    #mark for special playlist (watched, liked, disliked)
     algo_playlist = models.BooleanField(default=False, verbose_name = 'algo_playlist')
 
     creation_date = models.DateTimeField(auto_now_add=True,verbose_name = 'creation_date')
@@ -141,6 +142,8 @@ class Comment(models.Model):
     class Meta:
         ordering = ['comment_likes']
 
+#here are 4 receivers for generating unique slug, when an object is created
+#check utils.py to see the code of unique_slugify
 @receiver(pre_save, sender=Video)
 def slugfy_video(sender, instance, **kwargs):
     if instance.slug is None:
@@ -153,17 +156,6 @@ def first_save_channel(sender, instance, **kwargs):
         slug_str ="%s" % instance.username
         unique_slugify(instance, slug_str)
 
-@receiver(post_save, sender=Channel)
-def first_save_channel_add_playlists(sender, instance, **kwargs):
-        Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='liked', algo_playlist=True, channel_playlist = instance)
-        Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='disliked', algo_playlist=True, channel_playlist = instance)
-        Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='watched', algo_playlist=True, channel_playlist = instance)
-
-@receiver(pre_save, sender=Video)
-def set_publish_date(sender, instance, **kwargs):
-    if instance.published and instance.publish_date is None:
-        instance.publish_date = timezone.now()
-
 @receiver(pre_save, sender=Playlist)
 def slugify_playlist(sender, instance, **kwargs):
     if instance.slug is None:
@@ -175,7 +167,21 @@ def slugify_cat(sender, instance, **kwargs):
     if instance.slug is None:
         slug_str ="%s" % instance.category_name
         unique_slugify(instance, slug_str)
+#special receiver, wich triggers after channel obj is created
+#I need this to create 3 special playlists
+@receiver(post_save, sender=Channel)
+def first_save_channel_add_playlists(sender, instance, **kwargs):
+        Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='liked', algo_playlist=True, channel_playlist = instance)
+        Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='disliked', algo_playlist=True, channel_playlist = instance)
+        Playlist.objects.get_or_create(channel_playlist__id=instance.pk, playlist_name='watched', algo_playlist=True, channel_playlist = instance)
 
+#add proper publish date on video, only once when video gets publiched for the firt time
+@receiver(pre_save, sender=Video)
+def set_publish_date(sender, instance, **kwargs):
+    if instance.published and instance.publish_date is None:
+        instance.publish_date = timezone.now()
+
+#there are 3 receivers, to clear the files from the server, when objects get deleted
 @receiver(post_delete, sender=Channel)
 def slugify_cat(sender, instance, **kwargs):
     if instance.hat:

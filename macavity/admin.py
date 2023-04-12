@@ -1,7 +1,11 @@
 from django.contrib import admin
 from .models import *
 from django.utils.safestring import mark_safe
-# Register your models here.
+#just models registration.
+#it is not good, but i do not need admin panel, becouse of how the cite works,
+#so I didn't change it since the very begining of this project
+#I do not recoment to use admin panel at all becouse of not optimised sql queries
+#it is better to implent some moderation buttons in templates for superusers
 class VideoAdmin(admin.ModelAdmin):
     list_display = ('views','likes','dislikes','video_title','description','get_preview', 'get_video','published', 'blocked_video')
     list_display_links = ('video_title', 'get_preview')
@@ -48,26 +52,3 @@ admin.site.register(Video, VideoAdmin)
 admin.site.register(Playlist, PlaylistAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Comment, CommentAdmin)
-# from .models import *
-
-# class mymodelAdmin(admin.ModelAdmin):
-#     list_display = ('myfield1', 'myfield2') - поля для отображения в админке
-#     list_display_links = () - поля, которые будут работать как ссылки
-#     search_fields = () - поля, по которым можно производить поиск
-#     list_editable = ('',) - редактируемые поля
-#     list_filter = () - поля по которым можно фильтровать список статей
-
-# admin.site.register(mymodel, mymodelAdmin)
-    # list_display = ('id', 'title', 'time_create', 'get_html_photo', 'is_published')
-    # list_display_links = ('id', 'title')
-    # search_fields = ('title', 'content')
-    # list_editable = ('is_published',)
-    # list_filter = ('is_published', 'time_create')
-    # prepopulated_fields = {"slug": ("title",)}
-    # fields = ('title', 'slug', 'cat', 'content', 'photo', 'get_html_photo', 'is_published', 'time_create', 'time_update')
-    # readonly_fields = ('time_create', 'time_update', 'get_html_photo')
-    # save_on_top = True
-
-    # def get_html_photo(self, object):
-    #     if object.photo:
-    #         return mark_safe(f"<img src='{object.photo.url}' width=50>")

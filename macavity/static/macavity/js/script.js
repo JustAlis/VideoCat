@@ -1,3 +1,6 @@
+// I'm not js programmer, so I dont know how to write js properly
+// don't be mad at me if it looks bad, but everythiing works;)
+
 const menuBtn = document.querySelector('.menu-btn');
 const menu = document.querySelector('.menu');
 const content = document.querySelector('.content');
@@ -34,7 +37,7 @@ menuBtn.addEventListener('click', function(e) {
 }
   nav.classList.toggle('topnav-active');
 });
-
+// show/close categories under video
 if(cat_btn){
   cat_btn.onclick = function(e){
     e.preventDefault();
@@ -45,6 +48,7 @@ if(cat_btn){
     description_in_player.classList.toggle('description_in_player-active')
   }
 }
+//redirect to video change form 
 if(change_video_btn){
     change_video_btn.onclick = function(e){
       e.preventDefault();
@@ -90,7 +94,7 @@ if(add_cat_btn){
 if(add_to_playlist_btn){
   add_to_playlist_btn.onclick = function(e){
     e.preventDefault();
-
+    // event listener on click, to close window with categories, if click is outside this window
     function myclick(click){
       if (!(click.target === playlists_list || playlists_list.contains(click.target))){
         document.removeEventListener("click", myclick, true)

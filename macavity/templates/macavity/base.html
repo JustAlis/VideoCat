@@ -7,7 +7,7 @@
     <script type="text/javascript" src ="{% static 'macavity/js/script.js' %}" defer></script>
 </head>
 <body>
-    <a href="#" class="menu-btn"></a>
+    <!-- topnav -->
     <div class="topnav">
         <a href="{% url 'home' %}"><div class="logo"></div></a>
         <div class="topnav_title"><h2>title</h2></div>
@@ -28,6 +28,8 @@
             <a href="{% url 'register' %}">register</a>
         {% endif %}
 	</div>
+    <!-- side menu -->
+    <a href="#" class="menu-btn"></a>
     <div class="menu">
         <nav class="menu-list">
             <a href="{% url 'home' %}">Главная</a>
@@ -35,8 +37,8 @@
             {% if user.is_authenticated %}
                 <a href="{% url 'subscribes' %}">Подписки</a>
                 <a href="{% url 'playlists' user.slug %}">Плейлисты</a>
-                <a href="#">История</a>
-                <a href="#">Понравившиеся</a>
+                <a href="{% url 'watched' %}">История</a>
+                <a href="{% url 'liked' %}">Понравившиеся</a>
             {% endif %}
         </nav>
     </div>

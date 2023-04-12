@@ -1,3 +1,6 @@
+// I'm not js programmer, so I dont know how to write js properly
+// don't be mad at me if it looks bad, but everythiing works;)
+
 const menuBtn = document.querySelector('.menu-btn');
 const menu = document.querySelector('.menu');
 const content = document.querySelector('.content');
@@ -21,7 +24,10 @@ const change_video_btn = document.getElementById('change_video_btn')
 
 const subscribe_btn = document.getElementById('subscribe_btn')
 
-const subscribe_video_btn = documentgetElementById('subscribe_video_btn')
+const subscribe_video_btn = document.getElementById('subscribe_video_btn')
+
+const add_cat_btn = document.getElementById('add_cat_btn')
+
 //MENU SCRIPT
 menuBtn.addEventListener('click', function(e) {
   e.preventDefault();
@@ -31,7 +37,7 @@ menuBtn.addEventListener('click', function(e) {
 }
   nav.classList.toggle('topnav-active');
 });
-
+// show/close categories under video
 if(cat_btn){
   cat_btn.onclick = function(e){
     e.preventDefault();
@@ -42,6 +48,7 @@ if(cat_btn){
     description_in_player.classList.toggle('description_in_player-active')
   }
 }
+//redirect to video change form 
 if(change_video_btn){
     change_video_btn.onclick = function(e){
       e.preventDefault();
@@ -50,11 +57,44 @@ if(change_video_btn){
     }
   }
 
+//POST add cat ajax
+if(add_cat_btn){
+  add_cat_btn.onclick = function(e){
+    e.preventDefault();
+    let csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let url = window.location.href;
+    let input = document.getElementById('add_cat_form').add_cat_name.value
+    input = encodeURIComponent(input)
+
+    let data = JSON.stringify({
+      cat_name: input,
+      request: 'add_comment',
+    })
+
+    let xhr = new XMLHttpRequest();
+    
+    xhr.open('POST', url, true)
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    xhr.setRequestHeader('X-CSRFToken', csrf)
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState == 4 && xhr.status == 200){
+        let new_data=xhr.responseText;
+        let jsonResponse = JSON.parse(new_data);
+        
+        document.getElementById('id_cat').innerHTML = jsonResponse["html"];
+        document.getElementById('add_cat_form').reset();
+      }
+    }
+    xhr.send(data)
+    
+  }
+}
+
 //GET USER PLAYLISTS AJAX
 if(add_to_playlist_btn){
   add_to_playlist_btn.onclick = function(e){
     e.preventDefault();
-
+    // event listener on click, to close window with categories, if click is outside this window
     function myclick(click){
       if (!(click.target === playlists_list || playlists_list.contains(click.target))){
         document.removeEventListener("click", myclick, true)
@@ -275,7 +315,7 @@ if(subscribe_btn){
 if(subscribe_video_btn){
   subscribe_video_btn.onclick = function(e){
     e.preventDefault();
-    alert('так')
+
     let url = window.location.href
     let xhr = new XMLHttpRequest();
 

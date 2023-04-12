@@ -1,3 +1,6 @@
+#there is no neen in this code anymore
+#SKIP
+
 # from django.db import connection
 
 # def raw_likes_into_dislikes(disliked_playlist, disliked_video, liked_playlist):
